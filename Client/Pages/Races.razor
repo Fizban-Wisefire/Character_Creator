@@ -1,0 +1,51 @@
+﻿@page "/races"
+@using Entities;
+<PageTitle>Races</PageTitle>
+
+<h3>Races</h3>
+
+@if (RaceList == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="resourceContainer">
+        @foreach (var race in RaceList)
+            {
+            <a href="race/@race.Name">
+                <div class="resourceObject">
+                    <h3>@race.Name</h3>
+                    <p>@race.Resource</p>
+                    <p>@race.Description</p>
+                    <p>Str: @race.Str</p>
+                    <p>Dex: @race.Dex</p>
+                    <p>Con: @race.Con</p>
+                    <p>Wis: @race.Wis</p>
+                    <p>Int: @race.Int</p>
+                    <p>Cha: @race.Cha</p>
+                </div>
+            </a>
+            }
+    </div>
+}
+
+@code {
+    // Creates and populates the list of Races on page initialization
+    private List<Entities.Race>? RaceList;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Console.WriteLine("Initialized");
+        IDataAccess dataAccess = new JsonAccess();
+        List<Entities.Race> ReturnList = await dataAccess.GetRaces();
+
+        List<Entities.Race> BalanceLists(List<Entities.Race> ReturnList)
+        {
+            List<Entities.Race> RaceList = new List<Entities.Race>();
+            return RaceList;
+        }
+    }
+
+
+    }

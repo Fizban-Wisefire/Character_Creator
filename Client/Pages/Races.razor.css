@@ -1,0 +1,28 @@
+﻿body {
+    background-color: blue;
+}
+
+
+.resourceContainer {
+    width: 75%;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    grid-column-gap: 10px;
+    grid-row-gap: 10px;
+}
+
+.resourceObject{
+    height: 300px;
+    width: 500px;
+    border: solid 2px black;
+}
+
+.resourceObject p{
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+
+.a:link, a:visited {
+    color: black;
+}

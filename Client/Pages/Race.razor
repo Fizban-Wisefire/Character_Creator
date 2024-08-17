@@ -1,0 +1,117 @@
+﻿@using Entities
+@using System.Text.Json
+
+@page "/race/{race}"
+@inject HttpClient Http
+<PageTitle>Race: @race</PageTitle>
+
+
+@if (pageRace == null)
+{
+    <p>Looking for race infomation...</p>
+}
+
+else
+{
+    <h1>Race: @pageRace.Name</h1>
+    <p class="citation">Source: @pageRace.Resource</p>
+
+    <div class="racePageContainer">
+        @if (pageRace.DescriptionFeatures != null)
+        {
+            @foreach (RaceDescriptionFeature feature in pageRace.DescriptionFeatures)
+            {
+                <div class="racePageContainerSection, descriptionFeature">
+                    <h5>@feature.Name</h5>
+                    <p>@feature.Text</p>
+                </div>
+            }
+        }
+        @if (pageRace.MechanicFeatures != null)
+        {
+            @foreach (RaceMechanicFeature feature in pageRace.MechanicFeatures)
+            {
+                <div class="racePageContainerSection, mechanicFeature">
+                    <h5>@feature.Name</h5>
+                    <p>@feature.Text</p>
+                </div>
+            }
+        }
+    </div>
+}
+
+@code {
+    [Parameter]
+    public string? race { get; set; }
+
+    private List<Entities.Race>? races;
+    private List<Entities.RaceDescriptionFeature>? descriptionFeatures;
+    private List<Entities.RaceMechanicFeature>? mechanicFeatures;
+    public Entities.Race pageRace;
+    public List<Entities.RaceDescriptionFeature> descriptions;
+    public List<Entities.RaceMechanicFeature> mechanics;
+    protected override async Task OnInitializedAsync()
+    {
+
+
+        // Pulls the list of races into a list and then grabs the one with the same Name as the page
+        
+        races = await Http.GetFromJsonAsync<List<Entities.Race>>("sample-data/races.json");
+        Entities.Race getRace(List<Entities.Race> races, string raceName)
+        {
+            Entities.Race newRace = null;
+            foreach (Entities.Race listRace in races)
+            {
+                if(listRace.Name == raceName)
+                {
+                    newRace = listRace;
+                }
+            }
+            return newRace;
+        }
+        pageRace = getRace(races, race);
+
+
+        // Pulls the list of all race description features and the returns a sorted list with only the ones for the Race remaining
+        
+        descriptionFeatures = await Http.GetFromJsonAsync<List<Entities.RaceDescriptionFeature>>("sample-data/raceDescriptionFeatures.json");
+        List<Entities.RaceDescriptionFeature> getDescriptions(List<Entities.RaceDescriptionFeature> descriptionFeatures, string raceName)
+        {
+            Console.WriteLine("Description Start");
+            List<Entities.RaceDescriptionFeature> PageDescriptionFeatures = new List<Entities.RaceDescriptionFeature>();
+            foreach (Entities.RaceDescriptionFeature feature in descriptionFeatures)
+            {
+                if (feature.Race == raceName)
+                {
+                    PageDescriptionFeatures.Add(feature);
+                    Console.WriteLine(feature.Name);
+                }
+            }
+            return PageDescriptionFeatures;
+        }
+        pageRace.DescriptionFeatures = getDescriptions(descriptionFeatures, race);
+
+
+        // Pulls the list of all race mechanic features and the returns a sorted list with only the ones for the Race remaining
+
+        mechanicFeatures = await Http.GetFromJsonAsync<List<Entities.RaceMechanicFeature>>("sample-data/raceMechanicFeatures.json");
+        List<Entities.RaceMechanicFeature> getMechanics(List<Entities.RaceMechanicFeature> mechanicFeatures, string raceName)
+        {
+            Console.WriteLine("Mechanic Start");
+            List<Entities.RaceMechanicFeature> PageMechanicFeatures = new List<Entities.RaceMechanicFeature>();
+            foreach (Entities.RaceMechanicFeature feature in mechanicFeatures)
+            {
+                if (feature.Race == raceName)
+                {
+                    PageMechanicFeatures.Add(feature);
+                    Console.WriteLine(feature.Name);
+                }
+            }
+            return PageMechanicFeatures;
+        }
+        pageRace.MechanicFeatures = getMechanics(mechanicFeatures, race);
+
+        Console.WriteLine("Page Race is " +pageRace.Name);
+
+    }
+}
